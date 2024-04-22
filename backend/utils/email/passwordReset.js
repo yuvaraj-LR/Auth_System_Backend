@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer"
 
-export const sendWelcomeEmail = async(user) => {
+export const sendPasswordResetEmail = async(user) => {
     const transporter = nodemailer.createTransport({
         service: process.env.SMPT_SERVICE,
         auth: {
