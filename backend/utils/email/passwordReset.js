@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer"
 
-export const sendPasswordResetEmail = async(user) => {
+export const sendPasswordResetEmail = async(user, token) => {
     const transporter = nodemailer.createTransport({
         service: process.env.SMPT_SERVICE,
         auth: {
@@ -13,10 +13,13 @@ export const sendPasswordResetEmail = async(user) => {
         from: process.env.SMPT_MAIL,
         to: user.email,
         subject: `Welcome to ${process.env.PROJECT_NAME} application.`,
-        html: ``
+        html: `
+        <h1>Password Reset Mail</h1> \n \n
+        <p>This is the reset link to change your password. ${token} </p> 
+        `
     }
 
     await transporter.sendMail(mailOption);
     console.log("<---------------------------Welcome Mail--------------------------->");
-    console.log("Successfully send mail for welcome.");
+    console.log("Successfully send mail for reset password..");
 }

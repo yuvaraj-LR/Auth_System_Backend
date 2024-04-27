@@ -8,9 +8,15 @@ export const sendToken = async (user, res, statusCode) => {
       ),
       httpOnly: true,
     };
-    res
+
+    const userDetails = {
+      _id: user._id,
+      name: user.name,
+      email: user.email
+    }
+
+    return res
       .status(statusCode)
       .cookie("token", token, cookieOptions)
-      .json({ success: true, user, token });
+      .json({ success: true, userDetails, token });
   };
-  

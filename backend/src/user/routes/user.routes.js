@@ -1,6 +1,7 @@
 import express from "express"
 
 import {
+    getAllUsers,
     userDetails,
     createNewUser,
     logoutUser,
@@ -8,23 +9,30 @@ import {
     forgetPassword,
     resetUserPassword,
     updatePassword,
-    updateUserProfile
+    updateUserProfile,
+    sendOTP,
+    verifyOTP
 } from "../controller/user.controller.js"
+
+import {auth} from "../../../middleware/auth.js";
 
 const router = express.Router();
 
 // GET routes
-router.route("/getUserData/:id").get(userDetails)
+router.route("/getAllUsers").get(auth, getAllUsers);
+router.route("/:userId").get(userDetails)
 router.route("/logout").get(logoutUser);
+router.route("/login/verifyOTP").get(verifyOTP);
 
 // POST routes
 router.route("/signup").post(createNewUser);
 router.route("/login").post(userLogin);
 router.route("/password/forget").post(forgetPassword);
+router.route("/login/sendOTP").post(sendOTP);
 
-// PUT Routes
+// PUT Routes/
 router.route("/password/reset/:token").put(resetUserPassword);
-router.route("/password/update").put(updatePassword);
-router.route("/profile/update/:id").put(updateUserProfile);
+router.route("/password/update").put(auth, updatePassword);
+router.route("/profile/update/:id").put(auth, updateUserProfile);
 
 export default router;

@@ -13,7 +13,10 @@ export const sendWelcomeEmail = async(user) => {
         from: process.env.SMPT_MAIL,
         to: user.email,
         subject: `Welcome to ${process.env.PROJECT_NAME} application.`,
-        html: ``
+        html: `
+        <h1>Welcome Mail</h1> \n \n
+        <p>Thank you for registering into our webpage.</p>
+        `
     }
 
     await transporter.sendMail(mailOption);

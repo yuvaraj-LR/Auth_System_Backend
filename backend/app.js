@@ -30,7 +30,8 @@ app.use(errorHandlerMiddleware);
 
 // 404 API handler
 app.use((req, res) => {
-    res.status(503).send(handleUncaughtError);
+    console.log(handleUncaughtError());
+    res.status(503).send("You are in invalid API route");
 });
 
 export default app;
