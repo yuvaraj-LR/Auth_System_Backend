@@ -8,7 +8,7 @@ console.log(process.env.BUILDENV === "dev" ? `Currently our path is in local env
 console.log("<---------------------------------------------------------------------->");
 
 const URL = process.env.BUILDENV === "dev" ? process.env.PORT : process.env.LIVEURL;
-const serverStar = app.listen(URL, async (err) => {
+const serverStar = app.listen(8080, async (err) => {
   if (err) {
     console.log(`server failed with error ${err}`);
   } else {
