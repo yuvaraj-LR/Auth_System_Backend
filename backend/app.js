@@ -1,6 +1,7 @@
 import express from "express"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser";
+import bodyParser from "body-parser";
 
 // Configure the .env files.
 dotenv.config({ path: ".env" });
@@ -13,6 +14,9 @@ import {
 import userRoutes from "./src/user/routes/user.routes.js"
 
 const app = express();
+
+// Parse JSON bodies
+app.use(bodyParser.json());
 
 app.use(express.json());
 app.use(cookieParser());
