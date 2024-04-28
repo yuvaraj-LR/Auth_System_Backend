@@ -44,6 +44,7 @@ export const createNewUser = async(req, res, next) => {
 
 export const userLogin = async(req, res, next) => {
     const {email, password} = req.body;
+    console.log(email, password, "user dataa...");
 
     // If no email and password.
     if(!email || !password) {
@@ -52,6 +53,8 @@ export const userLogin = async(req, res, next) => {
 
     // If no user found.
     const user = await findUserRepo({email}, true);
+    console.log(user, "user data...");
+
     if (!user) {
         return next(
             new ErrorHandler(401, "user not found! please register!!")
@@ -60,6 +63,8 @@ export const userLogin = async(req, res, next) => {
 
     // Check for password.
     const isPasswordMatch = await passwordMatch(password, user.password);
+    console.log(isPasswordMatch, "password match...");
+
     if (!isPasswordMatch) {
         return next(new ErrorHandler(401, "Invalid passsword!"));
     }
