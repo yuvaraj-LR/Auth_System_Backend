@@ -2,6 +2,7 @@ import express from "express"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
+import cors from "cors";
 
 // Configure the .env files.
 dotenv.config({ path: ".env" });
@@ -14,6 +15,11 @@ import {
 import userRoutes from "./src/user/routes/user.routes.js"
 
 const app = express();
+
+
+
+// Allow requests from all origins
+app.use(cors());
 
 // Parse JSON bodies
 app.use(bodyParser.json());
