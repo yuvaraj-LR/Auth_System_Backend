@@ -15,7 +15,7 @@ export const sendPasswordResetEmail = async(user, token) => {
         subject: `Welcome to ${process.env.PROJECT_NAME} application.`,
         html: `
         <h1>Password Reset Mail</h1> \n \n
-        <p>This is the reset link to change your password. ${token} </p> 
+        <p>This is the reset link to change your password. ${process.env.BUILDENV === "dev" ? process.env.FRONT_DEV_URL : process.env.FRONT_LIVE_URL}/login/password/changepassword?username=${user.email}&token=${token} </p> 
         `
     }
 

@@ -16,8 +16,6 @@ import userRoutes from "./src/user/routes/user.routes.js"
 
 const app = express();
 
-
-
 // Allow requests from all origins
 app.use(cors());
 
