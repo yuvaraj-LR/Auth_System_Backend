@@ -32,8 +32,8 @@ router.route("/password/forget").post(forgetPassword);
 router.route("/login/sendOTP").post(sendOTP);
 router.route("/login/verifyOTP").post(verifyOTP);
 
-// PUT Routes/
-router.route("/password/reset/:token").put(resetUserPassword);
+// PUT routes
+router.route("/password/reset/").put(resetUserPassword);
 router.route("/password/update").put(updatePassword);
 router.route("/profile/update/:id").put(auth, updateUserProfile);
 

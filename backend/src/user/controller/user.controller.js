@@ -151,60 +151,102 @@ export const updateUserProfile = async(req, res, next) => {
     }
 }
 
-export const updatePassword = async(req, res, next) => {
-    const { email, currentPassword, newPassword, confirmPassword, token } = req.body;
+export const updatePassword = async (req, res, next) => {
+    const {email, currentPassword, newPassword, confirmPassword} = req.body;
 
-    try {
-        if(token) {
-            const user = await findUserRepo({email});
-            console.log(user, "userr..");
-            
-            if(user.resetPasswordToken != token) {
-                return next(new ErrorHandler(401, "Incorrect token!"))
-            }
-
-            // if(user.resetPasswordExpire < Date.now()) {
-            //     return next(new ErrorHandler(401, "Token expired!!"))
-            // }
-
-            // New and confirm password mismatch.
-            if(!newPassword || newPassword != confirmPassword) {
-                return next(new ErrorHandler(401, "new password and confirm password are mismatch."));
-            }
-
-            // Save to db.
-            user.password = await encryptedPwd(newPassword);
-            await user.save();
-            await sendToken(user, res, 200);
-        } else {
-            const user = await findUserRepo({ _id: req.user._id }, true);
-
-            // If no currentpassword given.
-            if(!currentPassword) {
-                return next(new ErrorHandler(401, "pls enter current password"));
-            }
-
-            // If currentPassword mismatch.
-            const passwordMatched = await passwordMatch(currentPassword, user.password);
-            if (!passwordMatched) {
-                return next(new ErrorHandler(401, "Incorrect current password!"));
-            }
-
-            // New and confirm password mismatch.
-            if(!newPassword || newPassword != confirmPassword) {
-                return next(new ErrorHandler(401, "new password and confirm password are mismatch."));
-            }
-
-            // Save to db.
-            user.password = await encryptedPwd(newPassword);
-            await user.save();
-            await sendToken(user, res, 200);
+    const user = await findUserRepo({email}, true);
+    console.log(user, "userrr...");
+        if (!user) {
+            return next(
+                new ErrorHandler(401, "user not found! please register!!")
+            );
         }
 
-    } catch (error) {
+        console.log(currentPassword, "currentPasss");
+        console.log(user.password, "userPasss");
+
+        // Check for password.
+        const isPasswordMatch = await passwordMatch(currentPassword, user.password);
+        console.log(isPasswordMatch, "password match...");
+
+        if (!isPasswordMatch) {
+            return next(new ErrorHandler(401, "Incorrect passsword!"));
+        }
+
+        // New and confirm password mismatch.
+        if(!newPassword || newPassword != confirmPassword) {
+            return next(new ErrorHandler(401, "new password and confirm password are mismatch."));
+        }
+
+        // Save to db.
+        user.password = await encryptedPwd(newPassword);
+        await user.save();
+
+        return res.status(200).json({success: true, msg: "Successfully changed password."})
+
+
+    try {
+        
+    } catch(error) {
+        console.log(error, "error");
         return next(new ErrorHandler(400, error));
     }
 }
+
+// export const updatePassword = async(req, res, next) => {
+//     const { email, currentPassword, newPassword, confirmPassword } = req.body;
+
+//     try {
+//         if(token) {
+//             const user = await findUserRepo({email});
+//             console.log(user, "userr..");
+            
+//             if(user.resetPasswordToken != token) {
+//                 return next(new ErrorHandler(401, "Incorrect token!"))
+//             }
+
+//             // if(user.resetPasswordExpire < Date.now()) {
+//             //     return next(new ErrorHandler(401, "Token expired!!"))
+//             // }
+
+//             // New and confirm password mismatch.
+//             if(!newPassword || newPassword != confirmPassword) {
+//                 return next(new ErrorHandler(401, "new password and confirm password are mismatch."));
+//             }
+
+//             // Save to db.
+//             user.password = await encryptedPwd(newPassword);
+//             await user.save();
+//             await sendToken(user, res, 200);
+//         } else {
+//             const user = await findUserRepo({ _id: req.user._id }, true);
+
+//             // If no currentpassword given.
+//             if(!currentPassword) {
+//                 return next(new ErrorHandler(401, "pls enter current password"));
+//             }
+
+//             // If currentPassword mismatch.
+//             const passwordMatched = await passwordMatch(currentPassword, user.password);
+//             if (!passwordMatched) {
+//                 return next(new ErrorHandler(401, "Incorrect current password!"));
+//             }
+
+//             // New and confirm password mismatch.
+//             if(!newPassword || newPassword != confirmPassword) {
+//                 return next(new ErrorHandler(401, "new password and confirm password are mismatch."));
+//             }
+
+//             // Save to db.
+//             user.password = await encryptedPwd(newPassword);
+//             await user.save();
+//             await sendToken(user, res, 200);
+//         }
+
+//     } catch (error) {
+//         return next(new ErrorHandler(400, error));
+//     }
+// }
 
 export const forgetPassword = async(req, res, next) => {
     const {email} = req.body;
@@ -230,13 +272,17 @@ export const forgetPassword = async(req, res, next) => {
 
 export const resetUserPassword = async(req, res, next) => {
     try {
-        const {token} = req.params;
+        const {token} = req.query;
         console.log(token, "tokenennn..");
     
         const user = await findUserRepo({"resetPasswordToken": token});
+        console.log(user, "userr...");
+
         await findUserForPasswordResetRepo(token);
     
         const {password, confirmPassword} = req.body;
+
+        console.log(password, confirmPassword, "passs");
     
         if(password != confirmPassword) {
             return next(new ErrorHandler(400, "Mismatch password and confirmPassword."));
@@ -244,8 +290,9 @@ export const resetUserPassword = async(req, res, next) => {
     
         let encryptedPass = await encryptedPwd(password);
         await resetPasswordRepo(user, encryptedPass);
-    
-        return res.status(200).json({success: true, msg: "Password reset successfully."})
+
+        // After successful login, send token.
+        await sendToken(user, res, 200);
     } catch (error) {
         return next(new ErrorHandler(400, error));
     }
