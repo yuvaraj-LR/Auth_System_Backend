@@ -15,6 +15,7 @@ import {
     resetPasswordRepo,
     sendOTPRepo
 } from "../model/user.repository.js"
+import { decodeToken } from "../../../utils/decodeToken.js";
 
 export const createNewUser = async(req, res, next) => {
     try {
@@ -90,6 +91,24 @@ export const getAllUsers = async(req, res, next) => {
     })
 }
 
+export const getUserDetail = async(req, res, next) => {
+    const token = req.headers.authorization;
+    const getUserIdFromToken = decodeToken(token);
+
+    const user = await findUserRepo({"_id": getUserIdFromToken.id});
+    if (!user) {
+        return next(
+            new ErrorHandler(401, "user not found! please register!!")
+        );
+    }
+
+    return res.status(200).json({
+        success: true,
+        userData: user
+    });
+
+}
+
 export const userDetails = async(req, res, next) => {
     const {userId} = req.params;
     
@@ -105,6 +124,7 @@ export const userDetails = async(req, res, next) => {
         success: true,
         userData: user
     });
+
 }
 
 export const logoutUser = async(req, res, next) => {

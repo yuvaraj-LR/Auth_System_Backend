@@ -1,6 +1,7 @@
 import express from "express"
 
 import {
+    getUserDetail,
     getAllUsers,
     userDetails,
     createNewUser,
@@ -19,6 +20,7 @@ import {auth} from "../../../middleware/auth.js";
 const router = express.Router();
 
 // GET routes
+router.route("/getDetails").get(getUserDetail);
 router.route("/getAllUsers").get(auth, getAllUsers);
 router.route("/:userId").get(userDetails)
 router.route("/logout").get(logoutUser);
