@@ -1,0 +1,1 @@
+export const checkgid = (gid) => {return process.env.GOOGLE_CLIENT_ID == gid}

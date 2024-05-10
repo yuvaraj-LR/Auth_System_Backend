@@ -12,7 +12,8 @@ import {
     updatePassword,
     updateUserProfile,
     sendOTP,
-    verifyOTP
+    verifyOTP,
+    googleLogin
 } from "../controller/user.controller.js"
 
 import {auth} from "../../../middleware/auth.js";
@@ -27,6 +28,7 @@ router.route("/logout").get(logoutUser);
 
 // POST routes
 router.route("/signup").post(createNewUser);
+router.route("/googlelogin").post(googleLogin);
 router.route("/login").post(userLogin);
 router.route("/password/forget").post(forgetPassword);
 router.route("/login/sendOTP").post(sendOTP);

@@ -5,6 +5,9 @@ import { sendOTPForLogin } from "../../../utils/email/sendLoginOTP.js";
 import { ErrorHandler } from "../../../utils/errorHandler.js";
 import { sendToken } from "../../../utils/sendToken.js";
 
+import { decodeToken } from "../../../utils/decodeToken.js";
+import { checkgid } from "../../../utils/checkgid.js";
+
 import {
     createNewUserRepo,
     findUserRepo,
@@ -15,7 +18,6 @@ import {
     resetPasswordRepo,
     sendOTPRepo
 } from "../model/user.repository.js"
-import { decodeToken } from "../../../utils/decodeToken.js";
 
 export const createNewUser = async(req, res, next) => {
     try {
@@ -370,5 +372,47 @@ export const verifyOTP = async(req, res, next) => {
     } catch (error) {
         return next(new ErrorHandler(400, error));
     }
+}
 
+export const googleLogin = async(req, res, next) => {
+    try {
+        const {token, gid} = req.body;
+        const checkGID = checkgid(gid);
+
+        // Check for Gid.
+        if(!checkGID) {
+            return next(new ErrorHandler(400, "Invalid client ID."))
+        }
+
+        // Decode the user details.
+        const decodeUserDetails = decodeToken(token);
+        console.log(decodeUserDetails, "userDetailss...");
+
+        const email = decodeUserDetails?.email;
+
+        // Find the user.
+        const user = await findUserRepo({email});
+
+        // If user found, just send access token else create a new field with user details.
+        if(user) {
+            await sendToken(user, res, 200);
+        } else {
+            const name = decodeUserDetails?.name ? decodeUserDetails?.name : "accesspass";
+
+            const userDetails = {
+                email, 
+                name,
+                "password": "accesspass"
+            }
+
+            // Save a new user.
+            const newUser = await createNewUserRepo(userDetails);
+            await sendToken(newUser, res, 200);
+
+            // Send a welcme mail.
+            await sendWelcomeEmail(newUser);
+        }
+    } catch (error) {
+        return next(new ErrorHandler(400, error));
+    }
 }
